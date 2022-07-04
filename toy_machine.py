@@ -164,22 +164,22 @@ def math_op(destination, value):
 
 
 def store_memory(address, value):
-    addr = str(address).zfill(2)[-2:]
+    address = str(address).zfill(2)[-2:]
     value = str(value).zfill(4)
 
     # Output if we are writing to memory location 'FF'.
     if addr == 'FF':
         print('> ' + value + ',', int(value, 16))
 
-    memory[addr] = value
+    memory[address] = value
 
 
 def store_register(address, value):
-    addr = str(address)[-1:]
+    address = str(address)[-1:]
     value = str(value).zfill(4)
     if addr == '00':
         raise Exception(f'Error at {convert_to_hex_string(program_counter)}: Register 00 is reserved')
-    registers[addr] = value
+    registers[address] = value
 
 
 if __name__ == '__main__':
