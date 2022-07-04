@@ -34,22 +34,28 @@ def execute():
     # All opcode values are taken from the TOY Reference Card.
 
     if opcode == '1': # Add
-        debug(f'Adding register {s} ({registers[s]}) to register {t} ({registers[t]}) and storing the result in register {d}')
+        debug(f'Adding register {s} ({registers[s]}) to register {t} \
+                ({registers[t]}) and storing the result in register {d}')
         math_op(d, a + b)
     if opcode == '2': # Subtract
-        debug(f'Subtracting register {t} ({registers[t]}) from register {s} ({registers[s]}) and storing the result in register {d}')
+        debug(f'Subtracting register {t} ({registers[t]}) from register {s} \
+                ({registers[s]}) and storing the result in register {d}')
         math_op(d, a - b)
     if opcode == '3': # Binary AND
-        debug(f'Performing binary AND on registers {s} and {t} and storing the result in register {d}')
+        debug(f'Performing binary AND on registers {s} and {t} and storing \
+                the result in register {d}')
         math_op(d, a & b)
     if opcode == '4': # Binary OR
-        debug(f'Performing binary OR on registers {s} and {t} and storing the result in register {d}')
+        debug(f'Performing binary OR on registers {s} and {t} and storing the \
+                result in register {d}')
         math_op(d, a ^ b)
     if opcode == '5': # Binary left shift
-        debug(f'Performing binary left shift on registers {s} by {t} and storing the result in register {d}')
+        debug(f'Performing binary left shift on registers {s} by {t} and \
+                storing the result in register {d}')
         math_op(d, a << b)
     if opcode == '6': # Binary right shift
-        debug(f'Performing binary right shift on registers {s} by {t} and storing the result in register {d}')
+        debug(f'Performing binary right shift on registers {s} by {t} and \
+                storing the result in register {d}')
         math_op(d, a >> b)
 
     # Store value 'addr' in register 'd'.
@@ -66,7 +72,8 @@ def execute():
     # Store the value in register 'd' in memory location 'addr',
     if opcode == '9':
         if addr == 'FF':
-            debug(f'Storing register {d} ({registers[d]}) in memory {addr} and printing {registers[d]}')
+            debug(f'Storing register {d} ({registers[d]}) in memory {addr} \
+                    and printing {registers[d]}')
         else:
             debug(f'Storing register {d} ({registers[d]}) in memory {addr}')
         store_memory(addr, registers[d])
@@ -74,16 +81,23 @@ def execute():
     # register 't', in register 'd' (See TOY Reference Card for a clearer
     # explanation).
     if opcode == 'A':
-        debug(f'Storing register {d} ({registers[d]}) in memory {registers[t]} and printing {registers[d]}')
+        if registers[t] == 'FF':
+            debug(f'Storing register {d} ({registers[d]}) in memory \
+                    {load_memory(registers[t])} and printing {registers[d]}')
+        else:
+            debug(f'Storing register {d} ({registers[d]}) in memory \
+                    {load_memory(registers[t])}')
         store_register(d, load_memory(registers[t]))
     # Store the value found at the memory location defined by the value in
     # register 't', in the memory location defined by the value in register 'd'
     # (See TOY Reference Card for a clearer explanation).
     if opcode == 'B':
         if registers[t] == 'FF':
-            debug(f'Storing register {d} ({registers[d]}) in memory {registers[t]} and printing {registers[d]}')
+            debug(f'Storing register {d} ({registers[d]}) in memory \
+                    {registers[t]} and printing {registers[d]}')
         else:
-            debug(f'Storing register {d} ({registers[d]}) in memory {registers[t]}')
+            debug(f'Storing register {d} ({registers[d]}) in memory \
+                    {registers[t]}')
         store_memory(registers[t], registers[d])
 
     if opcode == '0': # Halt
@@ -92,25 +106,34 @@ def execute():
     # If the value in register 'd' == 0, set the program counter to 'addr'.
     if opcode == 'C':
         if int(registers[d], 16) == 0:
-            debug(f'Checked if register {d} ({registers[d]}) was equal to zero - it was, so set the program counter to {int(addr, 16)}')
+            debug(f'Checked if register {d} ({registers[d]}) was equal to \
+                    zero - it was, so set the program counter to \
+                    {int(addr, 16)}')
             program_counter = int(addr, 16) - 1
         else:
-            debug(f'Checked if register {d} ({registers[d]}) was equal to zero - it was not')
+            debug(f'Checked if register {d} ({registers[d]}) was equal to \
+                    zero - it was not')
     # If the value in register 'd' > 0, set the program counter to 'addr'.
     if opcode == 'D':
         if int(registers[d], 16) > 0:
-            debug(f'Checked if register {d} ({registers[d]}) was greater than zero - it was, so set the program counter to {int(addr, 16)}')
+            debug(f'Checked if register {d} ({registers[d]}) was greater than \
+                    zero - it was, so set the program counter to \
+                    {int(addr, 16)}')
             program_counter = int(addr, 16) - 1
         else:
-            debug(f'Checked if register {d} ({registers[d]}) was greater than zero - it was not')
+            debug(f'Checked if register {d} ({registers[d]}) was greater than \
+                    zero - it was not')
     # Set the program counter to the value in register 'd'.
     if opcode == 'E':
-        debug(f'Setting the program counter to register {d} ({int(registers[d], 16) + 1})')
+        debug(f'Setting the program counter to register {d} \
+                ({int(registers[d], 16) + 1})')
         program_counter = int(registers[d], 16)
     # Set the program counter in register 'd', and set the program counter to
     # 'addr'.
     if opcode == 'F':
-        print(f'Storing the program counter ({convert_to_hex_string(program_counter)}) in register {d} and setting the program counter to {int(addr, 16)}')
+        print(f'Storing the program counter \
+                ({convert_to_hex_string(program_counter)}) in register {d} \
+                and setting the program counter to {int(addr, 16)}')
         store_register(d, convert_to_hex_string(program_counter))
         program_counter = int(addr, 16) - 1
 
@@ -159,7 +182,9 @@ def main():
 # 'value' in register 'destination'.
 def math_op(destination, value):
     if value < -32768 or 32767 < value:
-        raise Exception(f'Error at {convert_to_hex_string(program_counter)}: Operation outside the range of -32768 and 32767 ({str(value)})')
+        raise Exception(f'Error at {convert_to_hex_string(program_counter)}: \
+                          Operation outside the range of -32768 and 32767 \
+                          ({str(value)})')
     store_register(destination, convert_to_hex_string(value, 4))
 
 
@@ -178,7 +203,8 @@ def store_register(address, value):
     address = str(address)[-1:]
     value = str(value).zfill(4)
     if addr == '00':
-        raise Exception(f'Error at {convert_to_hex_string(program_counter)}: Register 00 is reserved')
+        raise Exception(f'Error at {convert_to_hex_string(program_counter)}: \
+                          Register 00 is reserved')
     registers[address] = value
 
 
