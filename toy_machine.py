@@ -193,7 +193,7 @@ def store_memory(address, value):
     value = str(value).zfill(4)
 
     # Output if we are writing to memory location 'FF'.
-    if addr == 'FF':
+    if address == 'FF':
         print('> ' + value + ',', int(value, 16))
 
     memory[address] = value
@@ -202,7 +202,7 @@ def store_memory(address, value):
 def store_register(address, value):
     address = str(address)[-1:]
     value = str(value).zfill(4)
-    if addr == '00':
+    if address == '00':
         raise Exception(f'Error at {convert_to_hex_string(program_counter)}: \
                           Register 00 is reserved')
     registers[address] = value
