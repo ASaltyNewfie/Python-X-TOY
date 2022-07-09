@@ -28,8 +28,8 @@ def execute():
     # Instructions 1 through 6 perform math operations on the values found
     # in two registers. For simplicity, those registers are loaded and
     # converted to decimal form.
-    a = int(registers[s], 16)
-    b = int(registers[t], 16)
+    a = convert_to_decimal(registers[s])
+    b = convert_to_decimal(registers[t])
 
     # All opcode values are taken from the TOY Reference Card.
 
@@ -105,11 +105,11 @@ def execute():
         return True
     # If the value in register 'd' == 0, set the program counter to 'addr'.
     if opcode == 'C':
-        if int(registers[d], 16) == 0:
+        if convert_to_decimal(registers[d]) == 0:
             debug(f'Checked if register {d} ({registers[d]}) was equal to \
                     zero - it was, so set the program counter to \
-                    {int(addr, 16)}')
-            program_counter = int(addr, 16) - 1
+                    {convert_to_decimal(addr)}')
+            program_counter = convert_to_decimal(addr) - 1
         else:
             debug(f'Checked if register {d} ({registers[d]}) was equal to \
                     zero - it was not')
@@ -118,33 +118,40 @@ def execute():
         if int(registers[d], 16) > 0:
             debug(f'Checked if register {d} ({registers[d]}) was greater than \
                     zero - it was, so set the program counter to \
-                    {int(addr, 16)}')
-            program_counter = int(addr, 16) - 1
+                    {convert_to_decimal(addr)}')
+            program_counter = convert_to_decimal(addr) - 1
         else:
             debug(f'Checked if register {d} ({registers[d]}) was greater than \
                     zero - it was not')
     # Set the program counter to the value in register 'd'.
     if opcode == 'E':
         debug(f'Setting the program counter to register {d} \
-                ({int(registers[d], 16) + 1})')
-        program_counter = int(registers[d], 16)
+                ({convert_to_decimal(registers[d], 16) + 1})')
+        program_counter = convert_to_decimal(registers[d], 16)
     # Set the program counter in register 'd', and set the program counter to
     # 'addr'.
     if opcode == 'F':
         print(f'Storing the program counter \
                 ({convert_to_hex_string(program_counter)}) in register {d} \
-                and setting the program counter to {int(addr, 16)}')
+                and setting the program counter to {convert_to_decimal(addr)}')
         store_register(d, convert_to_hex_string(program_counter))
-        program_counter = int(addr, 16) - 1
+        program_counter = convert_to_decimal(addr) - 1
 
     program_counter += 1
     return False
 
 
-# Converts an integer to an 'XX' format where X is a hex digit. 'digits'
-# provides zeropadding.
-def convert_to_hex_string(i, digits = 2):
-    return format(int(i), '0' + str(digits) + 'X')
+# Converts an integer to an 'XX' format where X is a hex digit.
+def convert_to_hex_string(i):
+    hex_string = hex(i)
+    return hex_string[hex_string.find('x') + 1:].upper()
+
+
+# Accounts for a four-digit hexadecimal two's complement representation.
+def convert_to_decimal(x):
+    decimal = int(x, 16)
+    if decimal > 32767: decimal -= 65536
+    return decimal
 
 
 def load_memory(location):
@@ -185,7 +192,7 @@ def math_op(destination, value):
         raise Exception(f'Error at {convert_to_hex_string(program_counter)}: \
                           Operation outside the range of -32768 and 32767 \
                           ({str(value)})')
-    store_register(destination, convert_to_hex_string(value, 4))
+    store_register(destination, convert_to_hex_string(value).zfill(4))
 
 
 def store_memory(address, value):
@@ -194,7 +201,7 @@ def store_memory(address, value):
 
     # Output if we are writing to memory location 'FF'.
     if address == 'FF':
-        print('> ' + value + ',', int(value, 16))
+        print('> ' + value + ',', convert_to_decimal(value))
 
     memory[address] = value
 
@@ -211,8 +218,8 @@ def store_register(address, value):
 if __name__ == '__main__':
     # Initialize registers and memory.
     for i in range(16):
-        registers[convert_to_hex_string(i, 1)] = '0000'
+        registers[convert_to_hex_string(i)] = '0000'
     for i in range(256):
-        memory[convert_to_hex_string(i)] = '0000'
+        memory[convert_to_hex_string(i).zfill(2)] = '0000'
 
     main()
